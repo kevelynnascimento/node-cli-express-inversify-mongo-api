@@ -1,45 +1,51 @@
 const getRepositoryTemplate = (name: string, camelCaseName: string, pascalCaseName: string): string => {
   return `
 import { injectable } from 'inversify';
-import { InsertResult, Repository, UpdateResult } from 'typeorm';
-import { DatabaseConfig } from '../configs/database.config';
 import { PaginationHelper } from '../helpers/pagination.helper';
 import { ${pascalCaseName}Entity } from '../../domain/entities/${name}.entity';
 import ${pascalCaseName}ListingRequest from '../../domain/dtos/${name}/requests/${name}-listing.request';
+import { DatabaseConfig } from '../configs/database.config';
+import { Collection, DeleteResult, InsertOneResult, UpdateResult } from 'mongodb';
 
 @injectable()
 export class ${pascalCaseName}Repository {
-  private repository: Repository<${pascalCaseName}Entity>;
+  private readonly collection: Collection<${pascalCaseName}Entity>;
 
   constructor() {
-    this.repository = DatabaseConfig.getConnection().getRepository(${pascalCaseName}Entity);
+    this.collection = DatabaseConfig.getCollection<${pascalCaseName}Entity>('${camelCaseName}');
   }
 
-  public async insert(${camelCaseName}: ${pascalCaseName}Entity): Promise<InsertResult> {
-    return this.repository.insert(${camelCaseName});
+  public async insert(${camelCaseName}: ${pascalCaseName}Entity): Promise<InsertOneResult<${pascalCaseName}Entity>> {
+    return await this.collection.insertOne(${camelCaseName});
   }
 
-  public async update(${camelCaseName}: ${pascalCaseName}Entity): Promise<UpdateResult> {
-    return this.repository.update({ id: ${camelCaseName}.id }, ${camelCaseName});
+  public async update(${camelCaseName}: ${pascalCaseName}Entity): Promise<UpdateResult<${pascalCaseName}Entity>> {
+    return await this.collection.updateOne({ id: ${camelCaseName}.id }, { $set: ${camelCaseName} });
   }
 
   public async findById(id: string): Promise<${pascalCaseName}Entity> {
-    return this.repository.findOneBy({ id });
+    return await this.collection.findOne({ id });
   }
 
-  async toList(paginationRequest: ${pascalCaseName}ListingRequest): Promise<[${pascalCaseName}Entity[], number]> {
-    const pagination = PaginationHelper.get(paginationRequest);
+  public async toList(paginationRequest: ${pascalCaseName}ListingRequest): Promise<[${pascalCaseName}Entity[], number]> {
+    const { skip, pageSize, sortColumn, sortDirection } = PaginationHelper.get(paginationRequest);
 
-    const result = await this.repository.findAndCount({
-      ...pagination,
-      where: {}
-    });
+    const items = this.collection
+      .find({})
+      .sort(sortColumn, sortDirection)
+      .skip(skip)
+      .limit(pageSize)
+      .toArray();
 
-    return result;
+    const total = this.collection.countDocuments();
+
+    const [rows, count] = await Promise.all([items, total]);
+
+    return [rows, count];
   }
 
-  public async delete(id: string): Promise<void> {
-    await this.repository.delete(id);
+  public async delete(id: string): Promise<DeleteResult> {
+    return await this.collection.deleteOne({ id });
   }
 }
 `;

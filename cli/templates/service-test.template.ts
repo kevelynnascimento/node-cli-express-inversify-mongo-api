@@ -5,6 +5,7 @@ import { mock, instance, when, verify, anything } from 'ts-mockito';
 import { ${pascalCaseName}Service } from '../${name}.service';
 import { ${pascalCaseName}Repository } from '../../../infrastructure/repositories/${name}.repository';
 import { ${pascalCaseName}Entity } from '../../entities/${name}.entity';
+import { SortDirection } from 'mongodb';
 
 describe('${pascalCaseName}Service', () => {
   let ${camelCaseName}Service: ${pascalCaseName}Service;
@@ -17,15 +18,14 @@ describe('${pascalCaseName}Service', () => {
   });
 
   describe('create', () => {
-    it('should create a new ${pascalCaseName}', async () => {
+    it('should create a new ${camelCaseName}', async () => {
       const request = {
         name: '${pascalCaseName} name'
       };
 
       const insertResultMock = {
-        identifiers: [],
-        generatedMaps: [],
-        raw: null
+        acknowledged: true,
+        insertedId: null,
       };
 
       when(${camelCaseName}RepositoryMock.insert(anything())).thenResolve(insertResultMock);
@@ -41,7 +41,7 @@ describe('${pascalCaseName}Service', () => {
   });
 
   describe('update', () => {
-    it('should update a ${pascalCaseName}', async () => {
+    it('should update a ${camelCaseName}', async () => {
       const ${camelCaseName}Mock = {
         id: '5',
         name: '${pascalCaseName} name',
@@ -51,9 +51,11 @@ describe('${pascalCaseName}Service', () => {
       };
 
       const updateResultMock = {
-        identifiers: [],
-        generatedMaps: [],
-        raw: null
+        acknowledged: true,
+        matchedCount: null,
+        modifiedCount: null,
+        upsertedCount: null,
+        upsertedId: null
       };
 
       const ${camelCaseName}UpdateRequest = {
@@ -88,7 +90,7 @@ describe('${pascalCaseName}Service', () => {
   });
 
   describe('disable', () => {
-    it('should disable a ${pascalCaseName}', async () => {
+    it('should disable a ${camelCaseName}', async () => {
       const ${camelCaseName}Mock = {
         id: '5',
         name: '${pascalCaseName} name',
@@ -98,9 +100,11 @@ describe('${pascalCaseName}Service', () => {
       };
 
       const updateResultMock = {
-        identifiers: [],
-        generatedMaps: [],
-        raw: null
+        acknowledged: true,
+        matchedCount: null,
+        modifiedCount: null,
+        upsertedCount: null,
+        upsertedId: null
       };
 
       when(${camelCaseName}RepositoryMock.findById(anything())).thenResolve(${camelCaseName}Mock);
@@ -127,7 +131,7 @@ describe('${pascalCaseName}Service', () => {
   });
 
   describe('findById', () => {
-    it('should find a ${pascalCaseName}', async () => {
+    it('should find a ${camelCaseName}', async () => {
       const ${camelCaseName}Mock = {
         id: '5',
         name: '${pascalCaseName} name',
@@ -162,7 +166,7 @@ describe('${pascalCaseName}Service', () => {
   });
 
   describe('toList', () => {
-    it('should find a ${pascalCaseName}', async () => {
+    it('should find a ${camelCaseName}', async () => {
       const itemsMock: [${pascalCaseName}Entity[], number] = [
         [
           {
@@ -197,7 +201,7 @@ describe('${pascalCaseName}Service', () => {
   });
 
   describe('delete', () => {
-    it('should delete a ${pascalCaseName}', async () => {
+    it('should delete a ${camelCaseName}', async () => {
       const id = '5';
 
       when(${camelCaseName}RepositoryMock.delete(anything())).thenResolve();
