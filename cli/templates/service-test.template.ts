@@ -179,8 +179,8 @@ describe('${pascalCaseName}Service', () => {
       const ${camelCaseName}ListingRequest = {
         page: 0,
         pageSize: 100,
-        orderColumn: null,
-        orderDirection: null
+        sortColumn: 'name',
+        sortDirection: 'asc' as SortDirection
       };
 
       when(${camelCaseName}RepositoryMock.toList(anything())).thenResolve(itemsMock);

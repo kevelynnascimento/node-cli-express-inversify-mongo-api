@@ -65,7 +65,7 @@ export class UserService {
   }
 
   public async findPaged(request: UserFindingPagedRequest): Promise<PaginationResponse<UserFindingPagedResponse>> {
-    const [users, count] = await this.userRepository.findAndCount(request);
+    const [users, count] = await this.userRepository.toList(request);
 
     const rows = users.map(({
       id,

@@ -1,28 +1,29 @@
+import { Sort, SortDirection } from "mongodb";
+
 export enum OrderDirectionEnum {
-    ASC = 'ASC',
-    DESC = 'DESC',
+  ASC = 'asc',
+  DESC = 'desc',
 }
 
 export interface PaginationResponse<T> {
-    rows: T[];
-    count: number;
+  rows: T[];
+  count: number;
 }
 
 export interface PaginationRequest {
-    page: number;
-    pageSize: number;
-    orderColumn: string;
-    orderDirection: OrderDirectionEnum;
+  page: number;
+  pageSize: number;
+  sortColumn: string;
+  sortDirection: SortDirection;
 }
 
 export class PaginationHelper {
-  public static get(paginationRequest: PaginationRequest) {
+  public static get(paginationRequest: PaginationRequest): { skip: number, pageSize: number, sortColumn: string, sortDirection: SortDirection } {
     const pagination = {
       skip: +paginationRequest.page * +paginationRequest.pageSize,
-      take: +paginationRequest.pageSize,
-      order: {
-        [paginationRequest.orderColumn]: paginationRequest.orderDirection,
-      },
+      pageSize: +paginationRequest.pageSize,
+      sortColumn: paginationRequest.sortColumn,
+      sortDirection: paginationRequest.sortDirection
     };
 
     return pagination;

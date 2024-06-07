@@ -2,38 +2,59 @@ import { injectable } from 'inversify';
 import { UserEntity } from '../../domain/entities/user.entity';
 import { DatabaseConfig } from '../configs/database.config';
 import { PaginationHelper, PaginationRequest } from '../helpers/pagination.helper';
-import { UserModel } from '../schemas/user.schema';
+import { Collection, DeleteResult, InsertOneResult, UpdateResult } from 'mongodb';
+import UserFindingPagedRequest from '../../domain/dtos/user/requests/user-finding-paged.request';
 
 @injectable()
 export class UserRepository {
-  public async insert(company: UserEntity): Promise<UserEntity> {
-    return await UserModel.create(company);
+  private readonly collection: Collection<UserEntity>;
+
+  constructor() {
+    this.collection = DatabaseConfig.getCollection<UserEntity>('user');
+  }
+
+  public async insert(company: UserEntity): Promise<InsertOneResult<UserEntity>> {
+    return await this.collection.insertOne(company);
+  }
+
+  public async update(company: UserEntity): Promise<UpdateResult<UserEntity>> {
+    return await this.collection.updateOne({ id: company.id }, { $set: company });
   }
 
   public async findById(id: string): Promise<UserEntity> {
-    return this.repository.findOneBy({ id });
+    return await this.collection.findOne({ id });
   }
 
-  async findAndCount(paginationRequest: PaginationRequest): Promise<[UserEntity[], number]> {
-    const pagination = PaginationHelper.get(paginationRequest);
-
-    const result = await this.repository.findAndCount({
-      ...pagination,
-      where: {}
-    });
-
-    return result;
+  public async delete(id: string): Promise<DeleteResult> {
+    return await this.collection.deleteOne({ id });
   }
 
-  public async findByUsername(username: string): Promise<UserEntity | null> {
-    return this.repository.findOneBy({ username });
+  public async findAll(): Promise<UserEntity[]> {
+    const items = await this.collection
+      .find({})
+      .toArray();
+
+    return items;
   }
 
-  public async update(user: UserEntity): Promise<UpdateResult> {
-    return this.repository.update({ id: user.id }, user);
+  public async toList(paginationRequest: UserFindingPagedRequest): Promise<[UserEntity[], number]> {
+    const { skip, pageSize, sortColumn, sortDirection } = PaginationHelper.get(paginationRequest);
+
+    const items = this.collection
+      .find({})
+      .sort(sortColumn, sortDirection)
+      .skip(skip)
+      .limit(pageSize)
+      .toArray();
+
+    const total = this.collection.countDocuments();
+
+    const [rows, count] = await Promise.all([items, total]);
+
+    return [rows, count];
   }
 
-  public async delete(id: string): Promise<void> {
-    await this.repository.delete(id);
+  public async findByUsername(username: string): Promise<UserEntity> {
+    return await this.collection.findOne({ username });
   }
 }

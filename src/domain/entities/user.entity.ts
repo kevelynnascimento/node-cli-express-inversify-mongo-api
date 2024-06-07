@@ -1,6 +1,4 @@
-import { Document } from 'mongoose';
-
-export class UserEntity extends Document {
+export class UserEntity {
   id: string;
   name: string;
   email: string;

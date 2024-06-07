@@ -3,6 +3,7 @@ import { mock, instance, when, verify, anything } from 'ts-mockito';
 import { CompanyService } from '../company.service';
 import { CompanyRepository } from '../../../infrastructure/repositories/company.repository';
 import { CompanyEntity } from '../../entities/company.entity';
+import { SortDirection } from 'mongodb';
 
 describe('CompanyService', () => {
   let companyService: CompanyService;
@@ -21,9 +22,8 @@ describe('CompanyService', () => {
       };
 
       const insertResultMock = {
-        identifiers: [],
-        generatedMaps: [],
-        raw: null
+        acknowledged: true,
+        insertedId: null,
       };
 
       when(companyRepositoryMock.insert(anything())).thenResolve(insertResultMock);
@@ -49,9 +49,11 @@ describe('CompanyService', () => {
       };
 
       const updateResultMock = {
-        identifiers: [],
-        generatedMaps: [],
-        raw: null
+        acknowledged: true,
+        matchedCount: null,
+        modifiedCount: null,
+        upsertedCount: null,
+        upsertedId: null
       };
 
       const companyUpdateRequest = {
@@ -96,9 +98,11 @@ describe('CompanyService', () => {
       };
 
       const updateResultMock = {
-        identifiers: [],
-        generatedMaps: [],
-        raw: null
+        acknowledged: true,
+        matchedCount: null,
+        modifiedCount: null,
+        upsertedCount: null,
+        upsertedId: null
       };
 
       when(companyRepositoryMock.findById(anything())).thenResolve(companyMock);
@@ -177,8 +181,8 @@ describe('CompanyService', () => {
       const companyListingRequest = {
         page: 0,
         pageSize: 100,
-        orderColumn: null,
-        orderDirection: null
+        sortColumn: 'name',
+        sortDirection: 'asc' as SortDirection
       };
 
       when(companyRepositoryMock.toList(anything())).thenResolve(companiesMock);

@@ -1,12 +1,19 @@
 import * as dotenv from 'dotenv';
-import * as mongoose from 'mongoose';
+import { Collection, Db, MongoClient } from 'mongodb';
 
 dotenv.config();
 
 export class DatabaseConfig {
+  private static client = new MongoClient(process.env.DATABASE_URI);
+  private static database: Db;
+
+  public static getCollection<T>(name: string): Collection<T> {
+    return this.database.collection<T>(name);
+  }
+
   public static initialize = async (): Promise<void> => {
     try {
-      await mongoose.connect(process.env.DATABASE_URI);
+      this.database = this.client.db(process.env.DATABASE_NAME);
       console.log('🟢 Data Source has been initialized.');
       this.setupCloseOnExit();
     } catch (error) {
@@ -27,7 +34,7 @@ export class DatabaseConfig {
 
   public static close = async (): Promise<void> => {
     try {
-      await mongoose.disconnect();
+      await this.client.close();
       console.log('🔴 Data Source has been closed.');
     } catch (error) {
       console.error('Error during Data Source closure:', error);

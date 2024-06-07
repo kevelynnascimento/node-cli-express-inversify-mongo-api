@@ -1,6 +1,4 @@
-import { Document } from 'mongoose';
-
-export class CompanyEntity extends Document {
+export class CompanyEntity {
   id: string;
   name: string;
   creationDate: Date;
