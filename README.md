@@ -44,12 +44,6 @@ npm install
 docker-compose up -d
 ```
 
-### To execute all migrations:
-
-```bash
-npm run migration:up
-```
-
 ### To start in regular mode:
 
 ```bash
@@ -88,16 +82,10 @@ npm run test:dev
 npm run test:coverage
 ```
 
-### Generate Migration:
-
-```bash
-npx typeorm migration:create migrations/{table-name}/{table-name}-{action}
-```
-
 ### Generate Structure using CLI:
 
 ```bash
 npm run cli -- create {structure-name}
 ```
 
-**Remeber to add the new controller, service and repository inside of the ContainerConfig and generate the new migration file after creating a new structure**
+**Remeber to add the new controller, service and repository inside of the ContainerConfig after creating a new structure**
